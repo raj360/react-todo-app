@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { PALETTE } from '../../styles/palette';
 import { Person, Lock } from '@mui/icons-material';
 import TextInput from '../../components/Intput';
