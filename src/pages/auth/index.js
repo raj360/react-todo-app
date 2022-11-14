@@ -19,35 +19,6 @@ const Form = styled('form')({
   alignItems: 'center',
 });
 
-const Base = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  color: PALETTE.SLATE_700,
-  margin: '0 0 20px',
-});
-
-const Input = styled('input')({
-  appearance: 'none',
-  background: 'inherit',
-  border: `1px solid ${PALETTE.SLATE_400}`,
-  borderRadius: 2,
-  display: 'block',
-  fontSize: 14,
-  lineHeight: '24px',
-  outline: 'none',
-  padding: '3px 0 3px 24px',
-  width: '400px',
-  '&:focus, &:active': {
-    border: `1px solid ${PALETTE.SKY_500}`,
-    boxShadow: `0 0 1px 1px ${PALETTE.SKY_300}`,
-  },
-});
-
-const Label = styled('div')({
-  alignSelf: 'start',
-});
-
 const PersonIcon = styled(Person)({
   width: 20,
   height: 20,
@@ -62,11 +33,6 @@ const LockIcon = styled(Lock)({
   margin: '0 4px 0 0',
   position: 'absolute',
   paddingLeft: '2px',
-});
-
-const InputWrapper = styled('div')({
-  display: 'flex',
-  alignItems: 'center',
 });
 
 const Button = styled('button')(({ disabled }) => ({
@@ -105,13 +71,11 @@ const Auth = () => {
 
   const { email, password } = values;
 
-  //validate Email
   const validateEmail = (email) => {
     const re = /\S+@\S+\.\S+/;
     return !re.test(email);
   };
 
-  //password should not be less than 4 characters
   const validatePassword = (password) => {
     return !(password.length >= 4 && password.length <= 16);
   };
