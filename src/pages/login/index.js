@@ -2,37 +2,15 @@ import styled from '@emotion/styled';
 import React, { useState } from 'react';
 import { PALETTE } from '../../styles/palette';
 import { Person, Lock } from '@mui/icons-material';
-import TextInput from '../../components/Intput';
-
-const Container = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '100vh',
-});
+import TextInput from '../../components/TextInput';
+import PageContainer from '../../components/PageContainer';
+import iconStyles from '../../styles/helpers/iconStyles';
 
 const Form = styled('form')({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
-});
-
-const PersonIcon = styled(Person)({
-  width: 20,
-  height: 20,
-  margin: '0 4px 0 0',
-  position: 'absolute',
-  paddingLeft: '2px',
-});
-
-const LockIcon = styled(Lock)({
-  width: 20,
-  height: 20,
-  margin: '0 4px 0 0',
-  position: 'absolute',
-  paddingLeft: '2px',
 });
 
 const Button = styled('button')(({ disabled }) => ({
@@ -46,7 +24,8 @@ const Button = styled('button')(({ disabled }) => ({
     opacity: disabled ? 1 : undefined,
   },
   height: '28px',
-  border: `1px solid ${PALETTE.SLATE_500}`,
+  border: disabled ? `1px solid ${PALETTE.SKY_300}` : `1px solid ${PALETTE.SKY_600}`,
+  boxShadow: disabled ? `2px 2px 0px 0px ${PALETTE.SLATE_500}` : `2px 2px 0px 0px ${PALETTE.SLATE_700}`,
 }));
 
 const InputError = styled('span')({
@@ -57,14 +36,20 @@ const InputError = styled('span')({
   textAlign: 'center',
 });
 
-const Header = styled('h2')({});
+const PersonIcon = styled(Person)(iconStyles);
+
+const LockIcon = styled(Lock)(iconStyles);
+
+const Header = styled('h1')({
+  margin: '0 0 30px',
+});
 
 const initialInputValues = {
   email: '',
   password: '',
 };
 
-const Auth = () => {
+const Login = () => {
   const [values, setValues] = useState(initialInputValues);
   const [emailFocus, setEmailFocus] = useState(false);
   const [passwordFocus, setPasswordFocus] = useState(false);
@@ -117,7 +102,7 @@ const Auth = () => {
         error: false,
         message: data?.message,
       });
-      // for now the end point is failing
+      // for now the end point is failing due to COR policy
       setWaiting(false);
     } catch (error) {
       console.log({ error });
@@ -130,7 +115,7 @@ const Auth = () => {
   };
 
   return (
-    <Container>
+    <PageContainer>
       <Header>Rapptr Labs</Header>
       <Form onSubmit={onSubmit}>
         <TextInput
@@ -169,9 +154,8 @@ const Auth = () => {
         </Button>
         {response.error && <InputError>{response.message}</InputError>}
       </Form>
-    </Container>
+    </PageContainer>
   );
 };
 
-export default Auth;
-
+export default Login;
