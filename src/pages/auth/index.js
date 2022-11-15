@@ -68,6 +68,12 @@ const Auth = () => {
   const [values, setValues] = useState(initialInputValues);
   const [emailFocus, setEmailFocus] = useState(false);
   const [passwordFocus, setPasswordFocus] = useState(false);
+  const [response, setResponse] = useState({
+    error: false,
+    message: '',
+  });
+
+  const [waiting, setWaiting] = useState(false);
 
   const { email, password } = values;
 
@@ -95,27 +101,59 @@ const Auth = () => {
   const emailValidation = validateEmail(email) && emailFocus;
   const passwordValidation = validatePassword(password) && passwordFocus;
 
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setWaiting(true);
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ email, password }),
+    };
+
+    try {
+      const response = await fetch('http://dev.rapptrlabs.com/Tests/scripts/user-login.php', requestOptions);
+      const data = await response.json();
+      setResponse({
+        error: false,
+        message: data?.message,
+      });
+      // for now the end point is failing
+      setWaiting(false);
+    } catch (error) {
+      console.log({ error });
+      setResponse({
+        error: true,
+        message: 'The server could not be reached. Please try again later',
+      });
+      setWaiting(false);
+    }
+  };
+
   return (
     <Container>
       <Header>Rapptr Labs</Header>
-      <Form>
+      <Form onSubmit={onSubmit}>
         <TextInput
           label="Email"
           type="email"
           name="email"
+          placeholder="user@rapptrlabs.com."
           value={email}
           onChange={handleInputChange}
           onFocus={setEmailFocus}
-          renderError={() => emailValidation && <InputError>Please enter a valid email</InputError>}
+          hasError={emailValidation}
+          renderError={() => emailValidation && <InputError>Not a valid email</InputError>}
           renderIcon={() => <PersonIcon />}
         />
         <TextInput
           label="Password"
           type="password"
           name="password"
+          placeholder="Must be atlease 4 characters."
           value={password}
           onChange={handleInputChange}
           onFocus={setPasswordFocus}
+          hasError={passwordValidation}
           renderError={() =>
             passwordValidation && (
               <InputError>
@@ -126,9 +164,10 @@ const Auth = () => {
           renderIcon={() => <LockIcon />}
         />
 
-        <Button disabled={isFormValid()} type="submit">
+        <Button disabled={isFormValid() || waiting} type="submit">
           Login
         </Button>
+        {response.error && <InputError>{response.message}</InputError>}
       </Form>
     </Container>
   );

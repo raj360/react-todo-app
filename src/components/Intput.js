@@ -10,10 +10,10 @@ const Base = styled('div')({
   margin: '0 0 20px',
 });
 
-const Input = styled('input')({
+const Input = styled('input')(({ hasError }) => ({
   appearance: 'none',
   background: 'inherit',
-  border: `1px solid ${PALETTE.SLATE_400}`,
+  border: `1px solid ${hasError ? PALETTE.TOMATO_500 : PALETTE.SLATE_500}`,
   borderRadius: 2,
   display: 'block',
   fontSize: 14,
@@ -22,10 +22,10 @@ const Input = styled('input')({
   padding: '3px 0 3px 24px',
   width: '400px',
   '&:focus, &:active': {
-    border: `1px solid ${PALETTE.SKY_500}`,
-    boxShadow: `0 0 1px 1px ${PALETTE.SKY_300}`,
+    border: `1px solid ${hasError ? PALETTE.TOMATO_500 : PALETTE.SKY_500}`,
+    boxShadow: `0 0 1px 1px ${hasError ? PALETTE.TOMATO_500 : PALETTE.SKY_300}`,
   },
-});
+}));
 
 const InputWrapper = styled('div')({
   display: 'flex',
@@ -36,17 +36,15 @@ const Label = styled('div')({
   alignSelf: 'start',
 });
 
-function TextInput({ value, type, name, onChange, onFocus, emailValidation, renderIcon, renderError, label }) {
-  return (
-    <Base>
-      <Label>{label}</Label>
-      <InputWrapper>
-        {renderIcon && renderIcon()}
-        <Input type={type} name={name} value={value} onChange={onChange} onFocus={onFocus} />
-      </InputWrapper>
-      {renderError && renderError()}
-    </Base>
-  );
-}
+const TextInput = ({ renderIcon, renderError, label, ...otherProps }) => (
+  <Base>
+    <Label>{label}</Label>
+    <InputWrapper>
+      {renderIcon && renderIcon()}
+      <Input {...otherProps} />
+    </InputWrapper>
+    {renderError && renderError()}
+  </Base>
+);
 
 export default TextInput;
