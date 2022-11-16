@@ -2,8 +2,8 @@ import { Routes, Route } from 'react-router-dom';
 import { Global } from '@emotion/core';
 import globalStyles from './styles/theme/globalStyles';
 import ErrorBoundary from './components/ErrorBoundary';
-import Home from './pages/home';
-import Auth from './pages/auth';
+import ToDoList from './pages/todo-list';
+import Login from './pages/login';
 
 const Root = () => {
   return (
@@ -11,8 +11,8 @@ const Root = () => {
       <Global styles={globalStyles} />
       <ErrorBoundary>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/" element={<ToDoList />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </ErrorBoundary>
     </>

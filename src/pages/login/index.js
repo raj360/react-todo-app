@@ -2,15 +2,9 @@ import styled from '@emotion/styled';
 import React, { useState } from 'react';
 import { PALETTE } from '../../styles/palette';
 import { Person, Lock } from '@mui/icons-material';
-import TextInput from '../../components/Intput';
-
-const Container = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '100vh',
-});
+import TextInput from '../../components/TextInput';
+import PageContainer from '../../components/PageContainer';
+import iconStyles from '../../styles/helpers/iconStyles';
 
 const Form = styled('form')({
   display: 'flex',
@@ -19,34 +13,20 @@ const Form = styled('form')({
   alignItems: 'center',
 });
 
-const PersonIcon = styled(Person)({
-  width: 20,
-  height: 20,
-  margin: '0 4px 0 0',
-  position: 'absolute',
-  paddingLeft: '2px',
-});
-
-const LockIcon = styled(Lock)({
-  width: 20,
-  height: 20,
-  margin: '0 4px 0 0',
-  position: 'absolute',
-  paddingLeft: '2px',
-});
-
 const Button = styled('button')(({ disabled }) => ({
   width: '100%',
   opacity: disabled ? 1 : undefined,
   background: disabled ? PALETTE.SKY_300 : PALETTE.SKY_600,
   color: PALETTE.WHITE,
+  cursor: 'pointer',
   outline: 0,
-  ':hover,:focus,:active': {
+  ':hover': {
     background: disabled ? PALETTE.SKY_300 : PALETTE.SKY_500,
     opacity: disabled ? 1 : undefined,
   },
   height: '28px',
-  border: `1px solid ${PALETTE.SLATE_500}`,
+  border: disabled ? `1px solid ${PALETTE.SKY_300}` : `1px solid ${PALETTE.SKY_600}`,
+  boxShadow: disabled ? `2px 2px 0px 0px ${PALETTE.SLATE_500}` : `2px 2px 0px 0px ${PALETTE.SLATE_700}`,
 }));
 
 const InputError = styled('span')({
@@ -57,17 +37,29 @@ const InputError = styled('span')({
   textAlign: 'center',
 });
 
-const Header = styled('h2')({});
+const PersonIcon = styled(Person)(iconStyles);
+
+const LockIcon = styled(Lock)(iconStyles);
+
+const Header = styled('h1')({
+  margin: '0 0 30px',
+});
 
 const initialInputValues = {
   email: '',
   password: '',
 };
 
-const Auth = () => {
+const Login = () => {
   const [values, setValues] = useState(initialInputValues);
   const [emailFocus, setEmailFocus] = useState(false);
   const [passwordFocus, setPasswordFocus] = useState(false);
+  const [response, setResponse] = useState({
+    error: false,
+    message: '',
+  });
+
+  const [waiting, setWaiting] = useState(false);
 
   const { email, password } = values;
 
@@ -95,27 +87,59 @@ const Auth = () => {
   const emailValidation = validateEmail(email) && emailFocus;
   const passwordValidation = validatePassword(password) && passwordFocus;
 
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setWaiting(true);
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ email, password }),
+    };
+
+    try {
+      const response = await fetch('http://dev.rapptrlabs.com/Tests/scripts/user-login.php', requestOptions);
+      const data = await response.json();
+      setResponse({
+        error: false,
+        message: data?.message,
+      });
+      // for now the end point is failing due to COR policy
+      setWaiting(false);
+    } catch (error) {
+      console.log({ error });
+      setResponse({
+        error: true,
+        message: 'The server could not be reached. Please try again later',
+      });
+      setWaiting(false);
+    }
+  };
+
   return (
-    <Container>
+    <PageContainer>
       <Header>Rapptr Labs</Header>
-      <Form>
+      <Form onSubmit={onSubmit}>
         <TextInput
           label="Email"
           type="email"
           name="email"
+          placeholder="user@rapptrlabs.com."
           value={email}
           onChange={handleInputChange}
           onFocus={setEmailFocus}
-          renderError={() => emailValidation && <InputError>Please enter a valid email</InputError>}
+          hasError={emailValidation}
+          renderError={() => emailValidation && <InputError>Not a valid email</InputError>}
           renderIcon={() => <PersonIcon />}
         />
         <TextInput
           label="Password"
           type="password"
           name="password"
+          placeholder="Must be atlease 4 characters."
           value={password}
           onChange={handleInputChange}
           onFocus={setPasswordFocus}
+          hasError={passwordValidation}
           renderError={() =>
             passwordValidation && (
               <InputError>
@@ -126,13 +150,13 @@ const Auth = () => {
           renderIcon={() => <LockIcon />}
         />
 
-        <Button disabled={isFormValid()} type="submit">
+        <Button disabled={isFormValid() || waiting} type="submit">
           Login
         </Button>
+        {response.error && <InputError>{response.message}</InputError>}
       </Form>
-    </Container>
+    </PageContainer>
   );
 };
 
-export default Auth;
-
+export default Login;
