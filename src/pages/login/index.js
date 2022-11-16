@@ -18,8 +18,9 @@ const Button = styled('button')(({ disabled }) => ({
   opacity: disabled ? 1 : undefined,
   background: disabled ? PALETTE.SKY_300 : PALETTE.SKY_600,
   color: PALETTE.WHITE,
+  cursor: 'pointer',
   outline: 0,
-  ':hover,:focus,:active': {
+  ':hover': {
     background: disabled ? PALETTE.SKY_300 : PALETTE.SKY_500,
     opacity: disabled ? 1 : undefined,
   },

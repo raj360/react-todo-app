@@ -3,7 +3,7 @@ import React from 'react';
 import PageContainer from '../../components/PageContainer';
 import TextInput from '../../components/TextInput';
 import { PALETTE } from '../../styles/palette';
-import { Search } from '@mui/icons-material';
+import { Search, Delete, Edit } from '@mui/icons-material';
 import iconStyles from '../../styles/helpers/iconStyles';
 
 const Header = styled('h1')({
@@ -33,7 +33,6 @@ const ToDoListWrapper = styled('div')({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'start',
-  margin: '0 0 20px',
   width: '500px',
   height: '100%',
   border: `2px solid ${PALETTE.SLATE_700}`,
@@ -43,37 +42,90 @@ const ToDoListWrapper = styled('div')({
 const SearchSection = styled('div')({
   display: 'flex',
   flexDirection: 'row',
-  width: '480px',
-  height: '20%',
-  justifyContent: 'space-around',
-  padding: '20px 0 0',
+  justifyContent: 'space-between',
+  padding: '20px 20px 0',
+  borderBottom: `2px solid ${PALETTE.SLATE_700}`,
 });
 
 const AddNewButton = styled('button')({
-  background: PALETTE.SKY_600,
+  background: PALETTE.SKY_500,
   border: `1px solid ${PALETTE.SLATE_500}`,
   boxShadow: `2px 2px 0px 0px ${PALETTE.SLATE_700}`,
   outline: 'none',
+  cursor: 'pointer',
   color: PALETTE.WHITE,
   height: '28px',
   padding: '8px',
-  ':hover,:focus,:active': {
-    background: PALETTE.SKY_500,
+  ':hover': {
+    background: PALETTE.SKY_300,
+  },
+});
+
+const SaveButton = styled(AddNewButton)({
+  background: PALETTE.SLATE_700,
+  ':hover': {
+    background: PALETTE.SLATE_500,
   },
 });
 
 const SearchInput = styled(TextInput)({
   width: '360px',
-  height: '28px',
   ':hover,:focus,:active': {
     border: `1px solid ${PALETTE.SKY_500}`,
   },
-  margin: '4px 0 0 4px',
+  borderRadius: '10px',
+});
+
+const SaveToDoInput = styled(TextInput)({
+  width: '300px',
+  padding: '3px 0 3px 4px',
 });
 
 const SearchIcon = styled(Search)({
   ...iconStyles,
-  margin: '4px 0 0 4px',
+  margin: '2px 0 0 2px',
+});
+
+const AddTodoForm = SearchSection.withComponent('div');
+
+const TodoListItem = styled(SearchSection)({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  padding: '20px 20px 20px',
+});
+
+const ActionWrapper = styled('div')({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '64px',
+});
+
+const actionIconStyles = {
+  width: 24,
+  height: 24,
+  margin: 0,
+  cursor: 'pointer',
+  position: 'relative',
+};
+
+const EditButton = styled(Edit)({
+  ...actionIconStyles,
+  ':hover': {
+    color: PALETTE.SKY_500,
+  },
+});
+
+const DeleteButton = styled(Delete)({
+  ...actionIconStyles,
+  ':hover': {
+    color: PALETTE.TOMATO_500,
+  },
+});
+
+const ToDoText = styled('p')({
+  fontSize: '20px',
 });
 
 function Home() {
@@ -85,12 +137,22 @@ function Home() {
       <ToDoListWrapper>
         <SearchSection>
           <SearchInput renderIcon={() => <SearchIcon />} placeholder="Search" />
-          <AddNewButton>Add New</AddNewButton>
+          <AddNewButton>New</AddNewButton>
         </SearchSection>
 
-        {/* TODO:  Add form */}
-        {/* TODO: todo listItem */}
-        {/* TODO: todo list */}
+        <AddTodoForm>
+          <SaveToDoInput placeholder="Add new todo" />
+          <SaveButton>Save</SaveButton>
+        </AddTodoForm>
+
+        <TodoListItem>
+          <ToDoText>Todo 1</ToDoText>
+
+          <ActionWrapper>
+            <EditButton />
+            <DeleteButton />
+          </ActionWrapper>
+        </TodoListItem>
       </ToDoListWrapper>
     </PageContainer>
   );
