@@ -1,10 +1,11 @@
 import styled from '@emotion/styled';
-import React from 'react';
-import PageContainer from '../../components/PageContainer';
-import TextInput from '../../components/TextInput';
-import { PALETTE } from '../../styles/palette';
+import React, { useState, useMemo } from 'react';
+import PageContainer from 'components/PageContainer';
+import TextInput from 'components/TextInput';
+import { PALETTE } from 'styles/palette';
 import { Search, Delete, Edit } from '@mui/icons-material';
-import iconStyles from '../../styles/helpers/iconStyles';
+import iconStyles from 'styles/helpers/iconStyles';
+import { useNavigate } from 'react-router-dom';
 
 const Header = styled('h1')({
   fontSize: 60,
@@ -20,9 +21,9 @@ const LogoutButton = styled('button')({
   background: PALETTE.WHITE,
   border: `1px solid ${PALETTE.SLATE_500}`,
   boxShadow: `2px 2px 0px 0px ${PALETTE.SLATE_700}`,
-  outline: 'none',
   color: PALETTE.SKY_500,
   padding: '8px',
+  cursor: 'pointer',
   ':hover,:focus,:active': {
     background: PALETTE.SKY_300,
     color: PALETTE.WHITE,
@@ -35,7 +36,7 @@ const ToDoListWrapper = styled('div')({
   justifyContent: 'start',
   width: '500px',
   height: '100%',
-  border: `2px solid ${PALETTE.SLATE_700}`,
+  border: `3px solid ${PALETTE.SLATE_700}`,
   borderRadius: '5px',
 });
 
@@ -51,7 +52,6 @@ const AddNewButton = styled('button')({
   background: PALETTE.SKY_500,
   border: `1px solid ${PALETTE.SLATE_500}`,
   boxShadow: `2px 2px 0px 0px ${PALETTE.SLATE_700}`,
-  outline: 'none',
   cursor: 'pointer',
   color: PALETTE.WHITE,
   height: '28px',
@@ -128,31 +128,121 @@ const ToDoText = styled('p')({
   fontSize: '20px',
 });
 
+//structure, this would have been explicity if I used typescript but wanted to keep thing simple
+//  id: '',
+// text: '',
+// isEditing:false
 function Home() {
+  const [todos, setTodos] = useState([]);
+  const [showAddTodoForm, setShowAddTodoForm] = useState(false);
+  const [todoValue, setTodoValue] = useState('');
+  const [searchValue, setSearchValue] = useState('');
+  const navigate = useNavigate();
+
+  const toggleAddTodoForm = () => {
+    setShowAddTodoForm((formStatus) => !formStatus);
+  };
+
+  const validateTodo = (todo) => {
+    return !(todo.length >= 1 && todo.length <= 25);
+  };
+
+  const handleSaveTodo = (action, todoId) => {
+    if (action === 'adding') {
+      const newTodo = {
+        id: Date.now(),
+        text: todoValue,
+        isEditing: false,
+      };
+
+      if (validateTodo(todoValue)) {
+        return;
+      }
+      setTodos((todos) => [newTodo, ...todos]);
+      setTodoValue('');
+      toggleAddTodoForm();
+    } else {
+      if (validateTodo(todoValue)) {
+        return;
+      }
+      const todoIndex = todos.findIndex((todo) => todo.id === todoId);
+      const updatedTodos = [...todos];
+      updatedTodos[todoIndex].isEditing = false;
+      updatedTodos[todoIndex].text = todoValue;
+      setTodos(updatedTodos);
+      setTodoValue('');
+    }
+  };
+
+  const handleOnChangeInput = (e) => {
+    setTodoValue(e.target.value);
+  };
+
+  const handleDeleteTodo = (id) => {
+    const index = todos.findIndex((todo) => todo.id === id);
+    const tempTodos = [...todos];
+    tempTodos.splice(index, 1);
+    setTodos(tempTodos);
+  };
+
+  const toggleEditTodoForm = (id) => {
+    const index = todos.findIndex((todo) => todo.id === id);
+    const tempTodos = [...todos];
+    tempTodos[index].isEditing = !tempTodos[index].isEditing;
+    setTodos(tempTodos);
+  };
+
+  const handleOnSearch = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const filteredTodos = useMemo(() => {
+    return todos.filter((todo) => todo.text.includes(searchValue));
+  }, [searchValue, todos]);
+
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('user');
+      navigate('/login');
+    }
+  };
+
   return (
     <PageContainer>
       <Header>My To-Do List</Header>
-      <LogoutButton>Logout</LogoutButton>
+      <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
 
       <ToDoListWrapper>
         <SearchSection>
-          <SearchInput renderIcon={() => <SearchIcon />} placeholder="Search" />
-          <AddNewButton>New</AddNewButton>
+          <SearchInput renderIcon={() => <SearchIcon />} placeholder="Search" onChange={handleOnSearch} />
+          <AddNewButton onClick={toggleAddTodoForm}>New</AddNewButton>
         </SearchSection>
 
-        <AddTodoForm>
-          <SaveToDoInput placeholder="Add new todo" />
-          <SaveButton>Save</SaveButton>
-        </AddTodoForm>
+        {showAddTodoForm && (
+          <AddTodoForm>
+            <SaveToDoInput placeholder="Add new todo" onChange={handleOnChangeInput} />
+            <SaveButton onClick={() => handleSaveTodo('adding')}>Save</SaveButton>
+          </AddTodoForm>
+        )}
 
-        <TodoListItem>
-          <ToDoText>Todo 1</ToDoText>
-
-          <ActionWrapper>
-            <EditButton />
-            <DeleteButton />
-          </ActionWrapper>
-        </TodoListItem>
+        {filteredTodos.map(({ id, text, isEditing }) => (
+          <>
+            {isEditing ? (
+              <AddTodoForm key={`${id}`}>
+                <SaveToDoInput defaultValue={text} onChange={handleOnChangeInput} />
+                <SaveButton onClick={() => handleSaveTodo('editing', id)}>Save</SaveButton>
+              </AddTodoForm>
+            ) : (
+              <TodoListItem key={`${id}`}>
+                <ToDoText>{text}</ToDoText>
+                <ActionWrapper>
+                  <EditButton onClick={() => toggleEditTodoForm(id)} />
+                  <DeleteButton onClick={() => handleDeleteTodo(id)} />
+                </ActionWrapper>
+              </TodoListItem>
+            )}
+          </>
+        ))}
       </ToDoListWrapper>
     </PageContainer>
   );

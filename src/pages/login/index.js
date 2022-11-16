@@ -1,10 +1,12 @@
 import styled from '@emotion/styled';
 import React, { useState } from 'react';
-import { PALETTE } from '../../styles/palette';
 import { Person, Lock } from '@mui/icons-material';
-import TextInput from '../../components/TextInput';
-import PageContainer from '../../components/PageContainer';
-import iconStyles from '../../styles/helpers/iconStyles';
+import { toast } from 'react-toastify';
+import { PALETTE } from 'styles/palette';
+import TextInput from 'components/TextInput';
+import PageContainer from 'components/PageContainer';
+import iconStyles from 'styles/helpers/iconStyles';
+import { useNavigate } from 'react-router-dom';
 
 const Form = styled('form')({
   display: 'flex',
@@ -19,7 +21,6 @@ const Button = styled('button')(({ disabled }) => ({
   background: disabled ? PALETTE.SKY_300 : PALETTE.SKY_600,
   color: PALETTE.WHITE,
   cursor: 'pointer',
-  outline: 0,
   ':hover': {
     background: disabled ? PALETTE.SKY_300 : PALETTE.SKY_500,
     opacity: disabled ? 1 : undefined,
@@ -50,10 +51,23 @@ const initialInputValues = {
   password: '',
 };
 
+const testData = {
+  user_id: 16,
+  user_email: 'test@rapptrlabs.com',
+  user_username: 'testuser',
+  user_is_active: 1,
+  user_profile_image: 'http://dev.rapptrlabs.com/Tests/images/taylor_avatar.png',
+  user_last_active_epoch: 1544680026,
+  user_creation_epoch: 1544713200,
+  user_is_new: 1,
+  user_token: '6dd4737a8b7ec61313ae5e900420d46815e1d13b2902be71b97a8fbf1f421a3e',
+};
+
 const Login = () => {
   const [values, setValues] = useState(initialInputValues);
   const [emailFocus, setEmailFocus] = useState(false);
   const [passwordFocus, setPasswordFocus] = useState(false);
+  const navigation = useNavigate();
   const [response, setResponse] = useState({
     error: false,
     message: '',
@@ -90,28 +104,45 @@ const Login = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setWaiting(true);
+
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ email, password }),
     };
 
+    // For testing purpose, for a successful login, use the following credentials:
+    // test@rapptrlabs.com as the email and Test123 as the password
+    if (testData.user_email === email && password === 'Test123') {
+      localStorage.setItem('user', JSON.stringify(testData));
+      navigation('/');
+      toast.success('Login successful');
+      return;
+    }
+
     try {
+      // currently CORs is enabled on the server side so all requestes from localhost:3000 are blocked by CORS policy
       const response = await fetch('http://dev.rapptrlabs.com/Tests/scripts/user-login.php', requestOptions);
       const data = await response.json();
       setResponse({
         error: false,
-        message: data?.message,
+        message: 'Login successful',
       });
-      // for now the end point is failing due to COR policy
+
+      if (data?.user_token) {
+        localStorage.setItem('user', JSON.stringify(data));
+        navigation.push('/');
+        toast.success('Login successful');
+      }
+
       setWaiting(false);
     } catch (error) {
-      console.log({ error });
       setResponse({
         error: true,
         message: 'The server could not be reached. Please try again later',
       });
       setWaiting(false);
+      toast.error('Login Failed');
     }
   };
 
