@@ -6,11 +6,18 @@ import { PALETTE } from 'styles/palette';
 import { Search, Delete, Edit } from '@mui/icons-material';
 import iconStyles from 'styles/helpers/iconStyles';
 import { useNavigate } from 'react-router-dom';
+import { makeMaxWidthMediaQuery } from 'utils';
+import { BREAKPOINTS } from 'styles/breakpoints';
 
 const Header = styled('h1')({
-  fontSize: 60,
+  fontSize: 48,
   alignItems: 'center',
-  margin: '20px 0 20px',
+  padding: '20px 0 0',
+  [makeMaxWidthMediaQuery(BREAKPOINTS.target)]: {
+    padding: '40px 0 20px',
+    fontSize: 36,
+    margin: '0 auto',
+  },
 });
 
 const LogoutButton = styled('button')({
@@ -30,7 +37,7 @@ const LogoutButton = styled('button')({
   },
 });
 
-const ToDoListWrapper = styled('div')({
+const ContentWrapper = styled('div')({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'start',
@@ -38,6 +45,23 @@ const ToDoListWrapper = styled('div')({
   height: '100%',
   border: `3px solid ${PALETTE.SLATE_700}`,
   borderRadius: '5px',
+  [makeMaxWidthMediaQuery(BREAKPOINTS.target)]: {
+    width: '375px',
+  },
+  overflow: 'hidden',
+});
+
+const TodoListWrapper = styled('div')({
+  overflowY: 'scroll',
+  '&::-webkit-scrollbar': {
+    webkitAppearance: 'none',
+    width: '1px',
+    height: '4px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    borderRadius: '2px',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
 });
 
 const SearchSection = styled('div')({
@@ -74,11 +98,19 @@ const SearchInput = styled(TextInput)({
     border: `1px solid ${PALETTE.SKY_500}`,
   },
   borderRadius: '10px',
+  [makeMaxWidthMediaQuery(BREAKPOINTS.target)]: {
+    width: '200px',
+    margin: '0 auto',
+  },
 });
 
 const SaveToDoInput = styled(TextInput)({
   width: '300px',
   padding: '3px 0 3px 4px',
+  [makeMaxWidthMediaQuery(BREAKPOINTS)]: {
+    width: '150px',
+    margin: '0 auto',
+  },
 });
 
 const SearchIcon = styled(Search)({
@@ -128,7 +160,7 @@ const ToDoText = styled('p')({
   fontSize: '20px',
 });
 
-//structure, this would have been explicity if I used typescript but wanted to keep thing simple
+//Structure of todo, this would have been explicit if I used typescript but wanted to keep thing simple
 //  id: '',
 // text: '',
 // isEditing:false
@@ -212,7 +244,7 @@ function Home() {
       <Header>My To-Do List</Header>
       <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
 
-      <ToDoListWrapper>
+      <ContentWrapper>
         <SearchSection>
           <SearchInput renderIcon={() => <SearchIcon />} placeholder="Search" onChange={handleOnSearch} />
           <AddNewButton onClick={toggleAddTodoForm}>New</AddNewButton>
@@ -225,25 +257,27 @@ function Home() {
           </AddTodoForm>
         )}
 
-        {filteredTodos.map(({ id, text, isEditing }) => (
-          <>
-            {isEditing ? (
-              <AddTodoForm key={`${id}`}>
-                <SaveToDoInput defaultValue={text} onChange={handleOnChangeInput} />
-                <SaveButton onClick={() => handleSaveTodo('editing', id)}>Save</SaveButton>
-              </AddTodoForm>
-            ) : (
-              <TodoListItem key={`${id}`}>
-                <ToDoText>{text}</ToDoText>
-                <ActionWrapper>
-                  <EditButton onClick={() => toggleEditTodoForm(id)} />
-                  <DeleteButton onClick={() => handleDeleteTodo(id)} />
-                </ActionWrapper>
-              </TodoListItem>
-            )}
-          </>
-        ))}
-      </ToDoListWrapper>
+        <TodoListWrapper>
+          {filteredTodos.map(({ id, text, isEditing }) => (
+            <>
+              {isEditing ? (
+                <AddTodoForm key={`${id}`}>
+                  <SaveToDoInput defaultValue={text} onChange={handleOnChangeInput} />
+                  <SaveButton onClick={() => handleSaveTodo('editing', id)}>Save</SaveButton>
+                </AddTodoForm>
+              ) : (
+                <TodoListItem key={`${id}`}>
+                  <ToDoText>{text}</ToDoText>
+                  <ActionWrapper>
+                    <EditButton onClick={() => toggleEditTodoForm(id)} />
+                    <DeleteButton onClick={() => handleDeleteTodo(id)} />
+                  </ActionWrapper>
+                </TodoListItem>
+              )}
+            </>
+          ))}
+        </TodoListWrapper>
+      </ContentWrapper>
     </PageContainer>
   );
 }

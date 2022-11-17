@@ -1,10 +1,10 @@
 import { Routes, Route } from 'react-router-dom';
 import { Global } from '@emotion/core';
-import globalStyles from './styles/theme/globalStyles';
-import ErrorBoundary from './components/ErrorBoundary';
-import ToDoList from './pages/todo-list';
-import Login from './pages/login';
-import RequireAuth from './components/RequireAuth';
+import globalStyles from 'styles/theme/globalStyles';
+import ErrorBoundary from 'components/ErrorBoundary';
+import ToDoList from 'pages/todo-list';
+import Login from 'pages/login';
+import RequireAuth from 'components/RequireAuth';
 
 const Root = () => {
   return (

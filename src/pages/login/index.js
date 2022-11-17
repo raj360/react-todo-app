@@ -7,6 +7,8 @@ import TextInput from 'components/TextInput';
 import PageContainer from 'components/PageContainer';
 import iconStyles from 'styles/helpers/iconStyles';
 import { useNavigate } from 'react-router-dom';
+import { makeMaxWidthMediaQuery } from 'utils';
+import { BREAKPOINTS } from 'styles/breakpoints';
 
 const Form = styled('form')({
   display: 'flex',
@@ -36,6 +38,16 @@ const InputError = styled('span')({
   marginTop: '4px',
   width: '400px',
   textAlign: 'center',
+  [makeMaxWidthMediaQuery(BREAKPOINTS.target)]: {
+    width: '280px',
+    margin: '0 auto',
+  },
+});
+
+const Input = styled(TextInput)({
+  [makeMaxWidthMediaQuery(BREAKPOINTS.target)]: {
+    width: '280px',
+  },
 });
 
 const PersonIcon = styled(Person)(iconStyles);
@@ -144,7 +156,7 @@ const Login = () => {
     <PageContainer>
       <Header>Rapptr Labs</Header>
       <Form onSubmit={onSubmit}>
-        <TextInput
+        <Input
           label="Email"
           type="email"
           name="email"
@@ -156,7 +168,7 @@ const Login = () => {
           renderError={() => emailValidation && <InputError>Not a valid email</InputError>}
           renderIcon={() => <PersonIcon />}
         />
-        <TextInput
+        <Input
           label="Password"
           type="password"
           name="password"
