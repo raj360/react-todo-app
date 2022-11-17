@@ -9,8 +9,6 @@ const Container = styled('div')({
   height: '100vh',
 });
 
-
-
 const PageContainer = ({ children }) => {
   return <Container>{children}</Container>;
 };

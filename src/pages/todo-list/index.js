@@ -160,7 +160,7 @@ const ToDoText = styled('p')({
   fontSize: '20px',
 });
 
-//structure, this would have been explicity if I used typescript but wanted to keep thing simple
+//Structure of todo, this would have been explicity if I used typescript but wanted to keep thing simple
 //  id: '',
 // text: '',
 // isEditing:false
