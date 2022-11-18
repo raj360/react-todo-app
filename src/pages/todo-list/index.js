@@ -127,6 +127,11 @@ const TodoListItem = styled(SearchSection)({
   padding: '20px 20px 20px',
 });
 
+const TodoListItemWrapper = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+});
+
 const ActionWrapper = styled('div')({
   display: 'flex',
   flexDirection: 'row',
@@ -259,14 +264,14 @@ function Home() {
 
         <TodoListWrapper>
           {filteredTodos.map(({ id, text, isEditing }) => (
-            <>
+            <TodoListItemWrapper key={id}>
               {isEditing ? (
-                <AddTodoForm key={`${id}`}>
+                <AddTodoForm>
                   <SaveToDoInput defaultValue={text} onChange={handleOnChangeInput} />
                   <SaveButton onClick={() => handleSaveTodo('editing', id)}>Save</SaveButton>
                 </AddTodoForm>
               ) : (
-                <TodoListItem key={`${id}`}>
+                <TodoListItem>
                   <ToDoText>{text}</ToDoText>
                   <ActionWrapper>
                     <EditButton onClick={() => toggleEditTodoForm(id)} />
@@ -274,7 +279,7 @@ function Home() {
                   </ActionWrapper>
                 </TodoListItem>
               )}
-            </>
+            </TodoListItemWrapper>
           ))}
         </TodoListWrapper>
       </ContentWrapper>
