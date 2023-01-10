@@ -111,23 +111,16 @@ const Login = () => {
     e.preventDefault();
     setWaiting(true);
 
+    const formdata = new FormData();
+    formdata.append('email', email);
+    formdata.append('password', password);
+
     const requestOptions = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ email, password }),
+      body: formdata,
     };
 
-    // For testing purpose, for a successful login, use the following credentials:
-    // test@rapptrlabs.com as the email and Test123 as the password
-    if (testData.user_email === email && password === 'Test123') {
-      localStorage.setItem('user', JSON.stringify(testData));
-      navigation('/');
-      toast.success('Login successful');
-      return;
-    }
-
     try {
-      // currently CORs is enabled on the server side so all requestes from localhost:3000 are blocked by CORS policy
       const response = await fetch('http://dev.rapptrlabs.com/Tests/scripts/user-login.php', requestOptions);
       const data = await response.json();
       setResponse({
@@ -137,15 +130,18 @@ const Login = () => {
 
       if (data?.user_token) {
         localStorage.setItem('user', JSON.stringify(data));
-        navigation.push('/');
+        navigation('/');
         toast.success('Login successful');
+      } else {
+        toast.error(`Login faild with exception: ${data?.message}`);
       }
 
       setWaiting(false);
     } catch (error) {
+      console.log({ error });
       setResponse({
         error: true,
-        message: 'The server could not be reached. Please try again later',
+        message: error.message,
       });
       setWaiting(false);
       toast.error('Login Failed');
